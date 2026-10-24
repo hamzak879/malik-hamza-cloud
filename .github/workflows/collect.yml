@@ -2,7 +2,7 @@ name: collect-history-24h
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # har 5 min, 24h - laptop OFF ho tab bhi chalega
+    - cron: "*/5 0-15 * * *"   # roz 16 ghante: UTC 00-15 = Pakistan 05:00-20:00 | 16h x 120/hr = ~1920 record/day
   workflow_dispatch: {}       # manual button bhi
 
 permissions:
@@ -17,12 +17,12 @@ jobs:
         with:
           node-version: 20
       # Har job ~4.5 min chalega aur andar har 32 sec me data laega = 30-sec wala hisab
-      - run: LOOP_SECONDS=60 node collector.mjs
+      - run: LOOP_SECONDS=270 node collector.mjs
         env:
-          LOOP_SECONDS: 60
+          LOOP_SECONDS: 270
       - run: |
           git config user.name "malik-hamza-bot"
           git config user.email "bot@localhost"
-          git add data/history.json
+          git add data/history.json data/latest-prediction.json
           git diff --cached --quiet || git commit -m "auto: update history $(date -u +%F-%T)"
           git push
