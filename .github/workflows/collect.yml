@@ -17,9 +17,9 @@ jobs:
         with:
           node-version: 20
       # Har job ~4.5 min chalega aur andar har 32 sec me data laega = 30-sec wala hisab
-      - run: LOOP_SECONDS=270 node collector.mjs
+      - run: LOOP_SECONDS=60 node collector.mjs
         env:
-          LOOP_SECONDS: 270
+          LOOP_SECONDS: 60
       - run: |
           git config user.name "malik-hamza-bot"
           git config user.email "bot@localhost"
