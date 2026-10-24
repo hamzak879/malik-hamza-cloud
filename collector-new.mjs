@@ -8,7 +8,7 @@ const OUT = new URL("../data/history.json", import.meta.url);
 const PRED_OUT = new URL("../data/latest-prediction.json", import.meta.url);
 const MAX_CLOUD = 2000; // ~16-17 ghante (30sec x 2000) - roz ka 16 hour window
 const INTERVAL_MS = 32000; // har 32 sec baad naya data
-const LOOP_SECONDS = Number(process.env.LOOP_SECONDS || "0"); // 0 = sirf 1 baar, 270 = ~4.5 min loop
+const LOOP_SECONDS = Number(process.env.LOOP_SECONDS || "0"); // 0 = sirf 1 baar, 60= ~1 min loop
 
 function extract(j) {
   if (Array.isArray(j)) return j;
