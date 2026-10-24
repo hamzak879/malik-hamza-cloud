@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MALIK_HAMZA</title>
+<style>
+:root{
+ --bg:#090d16;--panel:#111a29;--panel2:#192438;--line:#293851;
+ --txt:#f4f7ff;--muted:#8f9eb8;--gold:#f4cc72;
+ --green:#30dfa0;--red:#ff627c;--purple:#b58aff;--blue:#6ba9ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px Inter,Arial,sans-serif;transition:background .3s,color .3s}
+button,input,select{font:inherit}
+button{cursor:pointer;color:var(--txt);background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;transition:.22s}
+button:hover{border-color:var(--gold);transform:translateY(-2px)}
+button:active{transform:scale(.96)}
+input,select{width:100%;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);margin:7px 0 14px}
+label{display:block;font-size:12px;color:var(--muted)}
+h1,h2,h3,p{margin-top:0}
+h2{font-size:20px}h3{font-size:14px}
+small,.muted{color:var(--muted)}
+.gold{color:var(--gold)}.green{color:var(--green)}.red{color:var(--red)}
+.primary{background:var(--gold);color:#111;border-color:var(--gold);font-weight:bold}
+.hidden{display:none!important}
+#login{min-height:100dvh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at top,#243858 0%,var(--bg) 65%)}
+.loginbox{width:100%;max-width:380px;padding:28px;border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:0 20px 80px #0007}
+.logo{font-size:24px;font-weight:900;letter-spacing:2px}.logo span{color:var(--gold)}
+.logoOrb{width:70px;height:70px;border-radius:50%;margin:0 auto 20px;display:grid;place-items:center;color:#111;background:linear-gradient(135deg,#ffe8a1,#b98934);font-size:26px;font-weight:900;box-shadow:0 0 30px #f4cc7244;animation:float 3s ease-in-out infinite}
+#login .logo{text-align:center}#login .sub{text-align:center;margin:10px 0 25px}
+#login .primary{width:100%}
+#app{min-height:100dvh;padding-bottom:105px}
+header{height:76px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:5}
+.headright{text-align:right}
+.liveDot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 1.3s infinite}
+main{max-width:1100px;margin:auto;padding:18px 15px}
+.page{display:none;animation:enter .35s ease}.page.active{display:block}
+.eyebrow{font-size:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.titleRow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0 18px;flex-wrap:wrap}
+.card{background:linear-gradient(145deg,var(--panel),color-mix(in srgb,var(--panel) 82%,var(--bg)));border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:13px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.metric{font-size:26px;font-weight:800;margin:12px 0;color:var(--gold)}
+.statLabel{font-size:10px;color:var(--muted);letter-spacing:1px}
+.hero{position:relative;overflow:hidden;border-color:#67522b;background:radial-gradient(ellipse at 100% 0%,#70512555,transparent 45%),linear-gradient(135deg,var(--panel),#161b27);padding:22px}
+.hero:after{content:"";position:absolute;right:-35px;top:-65px;width:155px;height:155px;border-radius:50%;border:1px solid #f4cc7230;box-shadow:0 0 0 22px #f4cc7208,0 0 0 45px #f4cc7205;pointer-events:none}
+.predLine{font-size:35px;font-weight:900;letter-spacing:1px;margin:12px 0}
+.confidence{height:6px;border-radius:9px;background:var(--panel2);overflow:hidden;margin:12px 0}
+.confidence span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--gold));transition:width .5s}
+.bubbles{display:flex;gap:12px;flex-wrap:wrap;margin-top:15px}
+.bubble{height:67px;width:67px;display:grid;place-items:center;border-radius:50%;font-size:25px;font-weight:900;background:radial-gradient(circle at 32% 22%,#ffffff55,transparent 32%),linear-gradient(145deg,#6b9bff,#5640be);box-shadow:0 8px 24px #5845d844,inset 0 0 0 2px #ffffff24;animation:float 3s ease-in-out infinite}
+.bubble:nth-child(2){animation-delay:.45s;background:radial-gradient(circle at 30% 20%,#ffffff55,transparent 32%),linear-gradient(145deg,#f5d987,#9b7123);color:#15100a}
+.miniBubble{width:33px;height:33px;font-size:14px;display:inline-grid;place-items:center;border-radius:50%;background:#51469b;font-weight:bold}
+.streak{position:relative;overflow:hidden}
+.streak .metric{font-size:32px}
+.streak.win{border-color:#1b735b}.streak.loss{border-color:#85364b}
+.streak.win:after{content:"";position:absolute;width:5px;height:130%;background:#30dfa015;transform:rotate(28deg);right:35%;top:-10%;animation:sweep 3s infinite}
+.streak.loss:after{content:"";position:absolute;width:5px;height:130%;background:#ff627c10;transform:rotate(28deg);right:35%;top:-10%;animation:sweep 3.7s infinite}
+.chip{display:inline-block;padding:6px 10px;border-radius:20px;background:var(--panel2);color:var(--muted);font-size:11px}
+.chip.win{color:var(--green)}.chip.loss{color:var(--red)}.chip.jackpot{color:var(--gold)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pairGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pairCard{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px}
+.bar{height:6px;border-radius:8px;background:var(--panel2);overflow:hidden;margin:9px 0}
+.bar span{height:100%;display:block;background:var(--green)}
+.bar.orange span{background:var(--red)}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.actions button{flex:1;min-width:80px}
+.filter.active{background:var(--gold);color:#111}
+.scroll{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:490px}
+td,th{padding:12px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}
+th{font-size:10px;color:var(--gold);letter-spacing:1px}
+.empty{padding:16px;border:1px dashed #75602f;color:var(--gold);border-radius:12px;line-height:1.65}
+canvas{width:100%;height:230px;display:block}
+.bottomNav{position:fixed;bottom:0;left:0;right:0;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:9px max(10px,env(safe-area-inset-left)) calc(9px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+.navbtn{border:1px solid transparent;background:transparent;padding:6px 2px 4px;border-radius:14px;color:var(--muted);font-size:10px;display:flex;align-items:center;flex-direction:column;gap:5px}
+.navbubble{height:39px;width:48px;border-radius:24px;display:grid;place-items:center;font-size:20px;background:var(--panel2);border:1px solid var(--line);transition:.25s}
+.navbtn.active{color:var(--gold)}
+.navbtn.active .navbubble{background:linear-gradient(145deg,#ffe5a1,#b48a39);color:#17130a;box-shadow:0 0 22px #f4cc7240;transform:translateY(-5px);animation:navfloat 2s infinite}
+.navbtn.active[data-tab="live"] .navbubble{animation:livefloat 1.7s infinite}
+.note{font-size:11px;line-height:1.6;color:var(--muted)}
+@keyframes pulse{50%{opacity:.25;box-shadow:0 0 0 6px #30dfa01c}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes livefloat{0%,100%{transform:translateY(-3px) scale(1)}50%{transform:translateY(-7px) scale(1.05)}}
+@keyframes navfloat{0%,100%{box-shadow:0 0 15px #f4cc7220}50%{box-shadow:0 0 24px #f4cc7255}}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sweep{0%{transform:translateX(-90px) rotate(28deg)}100%{transform:translateX(140px) rotate(28deg)}}
+@media(min-width:750px){main{padding:24px}.pairGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){main{padding:12px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.card{padding:14px}.hero{padding:17px}.metric{font-size:23px}.predLine{font-size:30px}.bubble{height:61px;width:61px}.titleRow h2{font-size:18px}}
+</style>
+</head>
+<body>
+<section id="login">
+ <form class="loginbox" id="loginForm">
+  <div class="logoOrb">M</div>
+  <div class="logo">MALIK <span>HAMZA</span></div>
+  <div class="sub muted">SMART PATTERN ANALYTICS</div>
+  <label>ACCESS PASSWORD</label>
+  <input id="password" type="password" placeholder="Enter password" required>
+  <button class="primary">UNLOCK DASHBOARD ↗</button>
+  <p id="loginError" class="note"></p>
+  <p class="note">Private demo interface. Browser-only password protection is not secure authentication.</p>
+ </form>
+</section>
+
+<div id="app" class="hidden">
+<header>
+ <div><div class="logo">MALIK <span>HAMZA</span></div><small>Pattern intelligence</small></div>
+ <div class="headright"><small><span class="liveDot"></span><span id="status">CONNECTING</span></small><br><button id="sync" style="margin-top:7px;padding:7px 10px">↻ Sync</button></div>
+</header>
+<main>
+<section class="page active" id="live">
+ <div class="titleRow"><div><div class="eyebrow">LIVE PREDICT / 30S</div><h2 style="margin:0">Next result estimate</h2></div><span class="chip" id="period">Period ---</span></div>
+ <div class="card hero">
+  <div class="row"><span class="eyebrow">AUTO PATTERN SIGNAL</span><span class="chip" id="pair">PAIR -- → --</span></div>
+  <div class="predLine" id="pred">WAITING FOR DATA</div>
+  <div class="row"><small id="predDetail">Loading saved history…</small><span class="chip" id="sample">0 samples</span></div>
+  <div class="confidence"><span id="confidenceBar" style="width:0%"></span></div>
+  <small id="confidenceText">Historical frequency: not available</small>
+  <div class="bubbles" id="numberBubbles"><div class="bubble">?</div><div class="bubble">?</div></div>
+  <p class="note" style="margin:16px 0 0">Two most frequent next-number candidates for the detected pair. Past patterns do not guarantee the next outcome.</p>
+ </div>
+ <div class="grid">
+  <div class="card streak win"><div class="statLabel">WIN STREAK</div><div class="metric green" id="winStreak">0</div><small>Consecutive evaluated wins</small></div>
+  <div class="card streak loss"><div class="statLabel">LOSS STREAK</div><div class="metric red" id="lossStreak">0</div><small>Consecutive evaluated losses</small></div>
+  <div class="card"><div class="statLabel">TOTAL WINS</div><div class="metric green" id="wins">0</div><small>Evaluated predictions</small></div>
+  <div class="card"><div class="statLabel">TOTAL LOSSES</div><div class="metric red" id="losses">0</div><small>Evaluated predictions</small></div>
+ </div>
+ <div class="card"><div class="row"><h3>Latest 200 results</h3><span class="chip" id="recordCount">0 records</span></div>
+ <div class="scroll"><table><thead><tr><th>PERIOD</th><th>RESULT</th><th>SIZE</th><th>PREDICTION</th><th>STATUS</th></tr></thead><tbody id="liveRows"></tbody></table></div></div>
+</section>
+
+<section class="page" id="history">
+ <div class="titleRow"><div><div class="eyebrow">TRANSITION DATABASE</div><h2 style="margin:0">100 Pair History</h2></div><span class="chip">10 × 10 pairs</span></div>
+ <div class="card"><div class="grid"><div><div class="statLabel">BIG LEADER</div><div class="metric" id="bigLeader">—</div></div><div><div class="statLabel">SMALL LEADER</div><div class="metric" id="smallLeader">—</div></div><div><div class="statLabel">OBSERVED PAIRS</div><div class="metric" id="pairCount">0</div></div><div><div class="statLabel">MOST COMMON PAIR</div><div class="metric" id="commonPair">—</div></div></div></div>
+ <div class="card"><label>Search pair (e.g. 2,4)</label><input id="pairSearch" placeholder="Search all pairs…"><div id="pairCards" class="pairGrid"></div></div>
+ <div class="card"><div class="eyebrow">BIG VS SMALL FREQUENCY</div><h3>Historical distribution</h3><canvas id="historyChart"></canvas></div>
+</section>
+
+<section class="page" id="analysis">
+ <div class="titleRow"><div><div class="eyebrow">PERFORMANCE CENTRE</div><h2 style="margin:0">Analysis & Results</h2></div></div>
+ <div class="actions">
+  <button class="filter active" data-filter="ALL">All</button><button class="filter" data-filter="WIN">Win</button><button class="filter" data-filter="LOSS">Loss</button><button class="filter" data-filter="JACKPOT">Jackpot</button>
+ </div>
+ <div class="grid">
+  <div class="card"><div class="statLabel">WIN RATE</div><div class="metric green" id="winRate">0%</div></div>
+  <div class="card"><div class="statLabel">JACKPOTS</div><div class="metric gold" id="jackpots">0</div></div>
+  <div class="card"><div class="statLabel">EVALUATED</div><div class="metric" id="evaluated">0</div></div>
+  <div class="card"><div class="statLabel">UNRESOLVED</div><div class="metric" id="pending">0</div></div>
+ </div>
+ <div class="card"><h3>Performance graph</h3><canvas id="performanceChart"></canvas></div>
+ <div class="card"><h3>Filtered results</h3><div class="scroll"><table><thead><tr><th>PERIOD</th><th>ACTUAL</th><th>PREDICTED SIZE</th><th>NUMBERS</th><th>STATUS</th></tr></thead><tbody id="analysisRows"></tbody></table></div></div>
+</section>
+
+<section class="page" id="settings">
+ <div class="titleRow"><div><div class="eyebrow">PERSONALIZATION</div><h2 style="margin:0">Settings</h2></div></div>
+ <div class="card"><h3>Appearance</h3><div class="actions"><button id="theme">☾ Dark / Light</button><button id="animations">✦ Toggle animations</button></div>
+ <label>Background colour</label><input type="color" id="bgColour" value="#090d16"><button id="applyBg">Apply background</button>
+ <label style="margin-top:18px">Accent colour</label><input type="color" id="accentColour" value="#f4cc72"><button id="applyAccent">Apply accent</button>
+ <label style="margin-top:18px">Background image</label><input type="file" id="bgImage" accept="image/*"><div class="actions"><button id="applyImage">Set image</button><button id="removeImage">Remove image</button></div></div>
+ <div class="card"><h3>API Connection</h3><label>Primary result API</label><input id="api1"><label>History API</label><input id="api2"><div class="actions"><button class="primary" id="saveApi">Save endpoints</button><button id="testApi">Test API</button></div><p class="note" id="apiMessage">The browser may block external requests through CORS.</p></div>
+ <div class="card"><h3>History management</h3><div class="actions"><button id="export">Export history</button><button id="importBtn">Import JSON</button><button id="clear">Remove all history</button></div><input id="importFile" type="file" accept=".json,application/json" class="hidden"><p class="note">Records auto-save in this browser (localStorage) — refresh ya laptop OFF ke baad bhi rahenge. Login bhi saved rahega.</p></div>
+ <div class="card"><h3>Manual result</h3><label>Period ID</label><input id="manualPeriod" placeholder="Period ID"><label>Winning number (0–9)</label><input id="manualNumber" type="number" min="0" max="9"><button class="primary" id="addResult">Save result</button><p class="note" id="manualMessage"></p></div>
+</section>
+</main>
+
+<nav class="bottomNav">
+ <button class="navbtn active" data-tab="live"><span class="navbubble">◉</span><span>Live Predict</span></button>
+ <button class="navbtn" data-tab="history"><span class="navbubble">▤</span><span>History</span></button>
+ <button class="navbtn" data-tab="analysis"><span class="navbubble">⌁</span><span>Analysis</span></button>
+ <button class="navbtn" data-tab="settings"><span class="navbubble">⚙</span><span>Settings</span></button>
+</nav>
+</div>
+
+<script>
+(()=>{
+"use strict";
+const $=id=>document.getElementById(id);
+const API1="https://wingoteacher.lovable.app/api/public/wingo?game=30S";
+const API2="https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?size=200";
+const HIST="malik_hamza_records_v1",CONF="malik_hamza_settings_v1",AUTH="malik_hamza_auth";
+const OLD_HIST="nova_wingo_records_v3",OLD_CONF="nova_wingo_settings_v3",OLD_AUTH="nova_wingo_auth";
+// Migrate old WingoNova data so nothing is lost after rename
+try{
+ if(!localStorage.getItem(HIST)&&localStorage.getItem(OLD_HIST)){localStorage.setItem(HIST,localStorage.getItem(OLD_HIST))}
+ if(!localStorage.getItem(CONF)&&localStorage.getItem(OLD_CONF)){localStorage.setItem(CONF,localStorage.getItem(OLD_CONF))}
+ if(!localStorage.getItem(AUTH)&&(localStorage.getItem(OLD_AUTH)||sessionStorage.getItem(OLD_AUTH))){localStorage.setItem(AUTH,"1")}
+}catch(e){}
+let records=read(HIST,[]),conf=read(CONF,{}),filter="ALL",started=false,loading=false;
+const size=n=>n>=5?"BIG":"SMALL";
+const colour=n=>[0,5].includes(+n)?"VIOLET":[1,3,7,9].includes(+n)?"GREEN":"RED";
+const escape=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct=(n,d)=>d?(100*n/d).toFixed(1)+"%":"0.0%";
+function read(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
+function save(){localStorage.setItem(HIST,JSON.stringify(records))}
+function saveConf(){localStorage.setItem(CONF,JSON.stringify(conf))}
+function numberBubble(n){return `<span class="miniBubble">${n}</span>`}
+function norm(r,i=0){
+ if(typeof r==="number")r={number:r,issue:"manual-"+Date.now()+"-"+i};
+ if(typeof r==="string"&&/^\d$/.test(r))r={number:+r,issue:"manual-"+Date.now()+"-"+i};
+ if(!r||typeof r!=="object")return null;
+ let n=null;
+ // FIX: r.n must be accepted, otherwise saved history becomes null after refresh and gets deleted
+ for(const v of [r.n,r.number,r.result,r.openCode,r.winNumber,r.winningNumber,r.num,r.value,r.code]){
+  if(v===null||v===undefined)continue;
+  let s=String(v).trim(),m=s.match(/^\d/);
+  if(m){n=+m[0];break}
+ }
+ if(!Number.isInteger(n)||n<0||n>9)return null;
+ const issue=String(r.issueNumber??r.issue??r.period??r.periodNumber??r.drawIssue??("row-"+i));
+ return {issue,n,source:r.source||"API",outcome:r.outcome||"PENDING",predSize:r.predSize||"",predNums:Array.isArray(r.predNums)?r.predNums:[],jackpot:!!r.jackpot};
+}
+function extract(j){
+ if(Array.isArray(j))return j;
+ for(const x of [j?.data?.list,j?.data?.records,j?.data?.history,j?.data?.items,j?.data?.result,j?.list,j?.records,j?.history,j?.result,j?.data])
+  if(Array.isArray(x))return x;
+ return [];
+}
+function merge(rows){
+ const m=new Map(records.map(r=>[String(r.issue),r]));
+ rows.forEach((raw,i)=>{
+  const r=norm(raw,i);if(!r)return;
+  const prev=m.get(r.issue);
+  if(prev){
+   if(prev.outcome!=="PENDING"){r.outcome=prev.outcome;r.predSize=prev.predSize;r.predNums=prev.predNums;r.jackpot=prev.jackpot}
+   m.set(r.issue,{...r,...prev,n:r.n,source:r.source});
+  }else m.set(r.issue,r);
+ });
+ records=[...m.values()].sort((a,b)=>String(b.issue).localeCompare(String(a.issue),undefined,{numeric:true}));
+ evaluateNewResults();save();render();
+}
+function chronological(){return [...records].reverse()}
+function pairMap(){
+ const a=chronological(),m=new Map();
+ for(let i=0;i<a.length-2;i++){
+  const key=a[i].n+","+a[i+1].n;
+  if(!m.has(key))m.set(key,[]);
+  m.get(key).push(a[i+2].n);
+ }
+ return m;
+}
+function currentPair(){
+ if(records.length<2)return null;
+ return [records[1].n,records[0].n];
+}
+function stats(arr){
+ const big=arr.filter(n=>n>=5).length,small=arr.length-big;
+ return {big,small,total:arr.length,bigRate:arr.length?big/arr.length*100:0,smallRate:arr.length?small/arr.length*100:0};
+}
+function rankNumbers(arr){
+ const c=Array(10).fill(0);arr.forEach(n=>c[n]++);
+ return c.map((count,n)=>({n,count,rate:arr.length?count/arr.length*100:0})).filter(x=>x.count).sort((a,b)=>b.count-a.count||a.n-b.n);
+}
+function currentForecast(){
+ const p=currentPair();if(!p)return null;
+ const arr=pairMap().get(p.join(","))||[];
+ if(!arr.length)return {p,arr,stats:stats(arr),rank:[]};
+ return {p,arr,stats:stats(arr),rank:rankNumbers(arr)};
+}
+function makePendingPrediction(){
+ const f=currentForecast();if(!f||!f.rank.length)return null;
+ return {predSize:f.stats.bigRate>=f.stats.smallRate?"BIG":"SMALL",predNums:f.rank.slice(0,2).map(x=>x.n)};
+}
+function evaluateNewResults(){
+ // Resolve pending predictions when the next actual draw appears in saved chronological data.
+ const a=chronological();
+ for(let i=1;i<a.length;i++){
+  const cur=a[i],prev=a[i-1];
+  if(cur.outcome!=="PENDING"||!prev.predSize||!Array.isArray(prev.predNums)||!prev.predNums.length)continue;
+  cur.outcome=size(cur.n)===prev.predSize?"WIN":"LOSS";
+  cur.jackpot=prev.predNums.includes(cur.n);
+ }
+ // Keep the newest draw as the pending prediction target, without inventing its outcome.
+ const newest=records[0],forecast=makePendingPrediction();
+ if(newest&&forecast&&newest.outcome==="PENDING"){
+  newest.predSize=forecast.predSize;newest.predNums=forecast.predNums;
+ }
+}
+function statusBadge(r){
+ if(r.jackpot)return '<span class="chip jackpot">✦ JACKPOT</span>';
+ if(r.outcome==="WIN")return '<span class="chip win">WIN</span>';
+ if(r.outcome==="LOSS")return '<span class="chip loss">LOSS</span>';
+ return '<span class="chip">PENDING</span>';
+}
+function period3(issue){const d=String(issue).replace(/\D/g,"");return d?d.slice(-3).padStart(3,"0"):"---"}
+function streaks(){
+ const a=records.filter(r=>r.outcome==="WIN"||r.outcome==="LOSS");
+ let win=0,loss=0;
+ for(const r of a){if(r.outcome==="WIN"&&loss===0)win++;else break}
+ for(const r of a){if(r.outcome==="LOSS"&&win===0)loss++;else break}
+ let ws=0,ls=0;
+ for(const r of a){if(r.outcome==="WIN"){ws++;ls=0}else{ls++;ws=0}}
+ return {win:ws,loss:ls};
+}
+function renderLive(){
+ $("recordCount").textContent=records.length+" records";
+ const f=currentForecast();
+ if(!f){
+  $("period").textContent="Period ---";$("pair").textContent="PAIR -- → --";
+  $("pred").textContent="WAITING FOR DATA";$("predDetail").textContent="Load at least two actual results.";
+  $("sample").textContent="0 samples";$("confidenceBar").style.width="0%";
+  $("confidenceText").textContent="Historical frequency unavailable";
+  $("numberBubbles").innerHTML='<div class="bubble">?</div><div class="bubble">?</div>';
+ }else{
+  $("period").textContent="Period "+period3(records[0].issue);
+  $("pair").textContent="PAIR "+f.p[0]+" → "+f.p[1];
+  if(!f.rank.length){
+   $("pred").textContent="SOON";$("predDetail").textContent="No historical transition for this pair.";
+   $("sample").textContent="0 samples";$("confidenceBar").style.width="0%";
+   $("confidenceText").textContent="Abhi history mein nahi hai";
+   $("numberBubbles").innerHTML='<div class="bubble">?</div><div class="bubble">?</div>';
+  }else{
+   const leader=f.stats.bigRate>=f.stats.smallRate?"BIG":"SMALL";
+   const rate=Math.max(f.stats.bigRate,f.stats.smallRate);
+   $("pred").innerHTML=leader==="BIG"?'<span class="green">BIG</span>':'<span class="red">SMALL</span>';
+   $("predDetail").textContent=leader+" had the higher historical frequency";
+   $("sample").textContent=f.arr.length+" samples";
+   $("confidenceBar").style.width=rate+"%";
+   $("confidenceText").textContent="Historical frequency "+pct(Math.max(f.stats.big,f.stats.small),f.arr.length)+" · Not a guaranteed probability";
+   const c=[...f.rank];while(c.length<2)c.push({n:"?",count:0});
+   $("numberBubbles").innerHTML=c.slice(0,2).map(x=>`<div style="text-align:center"><div class="bubble">${x.n}</div><small>${x.n==="?"?"No data":size(x.n)+" · "+pct(x.count,f.arr.length)}</small></div>`).join("");
+  }
+ }
+ const s=streaks();$("winStreak").textContent=s.win;$("lossStreak").textContent=s.loss;
+ $("wins").textContent=records.filter(r=>r.outcome==="WIN").length;
+ $("losses").textContent=records.filter(r=>r.outcome==="LOSS").length;
+ $("liveRows").innerHTML=records.slice(0,200).map(r=>`<tr><td>${escape(period3(r.issue))}</td><td>${numberBubble(r.n)}</td><td>${size(r.n)}</td><td>${r.predSize||"—"} ${r.predNums?.length?"("+r.predNums.join(", ")+")":""}</td><td>${statusBadge(r)}</td></tr>`).join("")||'<tr><td colspan="5">SOON — Abhi history mein nahi hai</td></tr>';
+}
+function renderPairs(){
+ const m=pairMap(),q=$("pairSearch").value.trim().replace(/\s/g,""),cards=[];
+ let bigLeader={pair:"—",rate:-1},smallLeader={pair:"—",rate:-1},common={pair:"—",count:0};
+ for(let a=0;a<10;a++)for(let b=0;b<10;b++){
+  const key=a+","+b,arr=m.get(key)||[],s=stats(arr);
+  if(s.total&&s.bigRate>bigLeader.rate)bigLeader={pair:key,rate:s.bigRate};
+  if(s.total&&s.smallRate>smallLeader.rate)smallLeader={pair:key,rate:s.smallRate};
+  if(s.total>common.count)common={pair:key,count:s.total};
+  if(q&&!key.includes(q))continue;
+  const lead=s.total?(s.bigRate>=s.smallRate?"BIG":"SMALL"):"SOON";
+  cards.push(`<div class="pairCard"><div class="row"><b>${a} → ${b}</b><span class="chip">${s.total} times</span></div>
+   <div class="bar"><span style="width:${s.bigRate}%"></span></div><div class="row"><small>BIG ${s.big} · ${pct(s.big,s.total)}</small><small class="green">${s.total&&s.bigRate>=s.smallRate?"LEADER":""}</small></div>
+   <div class="bar orange"><span style="width:${s.smallRate}%"></span></div><div class="row"><small>SMALL ${s.small} · ${pct(s.small,s.total)}</small><small class="red">${s.total&&s.smallRate>s.bigRate?"LEADER":""}</small></div>
+   <p class="note">Historical leader: <b>${lead}</b></p></div>`);
+ }
+ $("pairCards").innerHTML=cards.join("");
+ $("bigLeader").textContent=bigLeader.rate<0?"—":bigLeader.pair;
+ $("smallLeader").textContent=smallLeader.rate<0?"—":smallLeader.pair;
+ $("pairCount").textContent=[...m.values()].filter(a=>a.length).length;
+ $("commonPair").textContent=common.count?common.pair:"—";
+ drawBars($("historyChart"),[
+  {label:"BIG",v:records.filter(r=>r.n>=5).length},
+  {label:"SMALL",v:records.filter(r=>r.n<5).length}
+ ]);
+}
+function evaluated(){return records.filter(r=>r.outcome==="WIN"||r.outcome==="LOSS")}
+function renderAnalysis(){
+ const ev=evaluated(),wins=ev.filter(r=>r.outcome==="WIN").length;
+ $("winRate").textContent=pct(wins,ev.length);
+ $("jackpots").textContent=records.filter(r=>r.jackpot).length;
+ $("evaluated").textContent=ev.length;
+ $("pending").textContent=records.filter(r=>r.outcome==="PENDING").length;
+ const arr=records.filter(r=>filter==="ALL"||(filter==="JACKPOT"?r.jackpot:r.outcome===filter));
+ $("analysisRows").innerHTML=arr.slice(0,200).map(r=>`<tr><td>${escape(period3(r.issue))}</td><td>${r.n} · ${size(r.n)}</td><td>${r.predSize||"—"}</td><td>${r.predNums?.join(", ")||"—"}</td><td>${statusBadge(r)}</td></tr>`).join("")||'<tr><td colspan="5">No matching results yet.</td></tr>';
+ drawBars($("performanceChart"),[
+  {label:"WIN",v:records.filter(r=>r.outcome==="WIN").length},
+  {label:"LOSS",v:records.filter(r=>r.outcome==="LOSS").length},
+  {label:"JACKPOT",v:records.filter(r=>r.jackpot).length},
+  {label:"PENDING",v:records.filter(r=>r.outcome==="PENDING").length}
+ ]);
+}
+function drawBars(canvas,items){
+ const ctx=canvas.getContext("2d"),w=canvas.clientWidth||320,h=230,dpr=window.devicePixelRatio||1;
+ canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ const max=Math.max(1,...items.map(x=>x.v)),step=w/items.length;
+ items.forEach((it,i)=>{
+  const bh=it.v/max*135,x=i*step+step*.25,bw=step*.5;
+  ctx.fillStyle=["#30dfa0","#ff627c","#f4cc72","#6ba9ff"][i%4];
+  ctx.beginPath();ctx.roundRect(x,165-bh,bw,bh,5);ctx.fill();
+  ctx.fillStyle=getComputedStyle(document.body).color;ctx.textAlign="center";ctx.font="12px Arial";
+  ctx.fillText(String(it.v),x+bw/2,153-bh);
+  ctx.fillStyle="#91a0b5";ctx.fillText(it.label,x+bw/2,190);
+ });
+}
+function render(){renderLive();renderPairs();renderAnalysis()}
+function showTab(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));
+ if(id==="analysis")renderAnalysis();if(id==="history")renderPairs();
+}
+async function sync(){
+ if(loading)return;loading=true;$("status").textContent="SYNCING";
+ // 1) Pehle cloud backup (GitHub 24h data) load karo - laptop OFF ho tab ka data bhi aa jayega
+ try{
+  const rc=await fetch("./data/history.json",{cache:"no-store"});
+  if(rc.ok){const jc=await rc.json(); if(Array.isArray(jc)&&jc.length){merge(jc);}}
+ }catch(e){console.warn("cloud backup unavailable:",e.message)}
+ const endpoints=[conf.api1||API1,conf.api2||API2];let received=0;
+ for(const url of endpoints){
+  try{
+   const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),10000);
+   const res=await fetch(url,{cache:"no-store",signal:ctrl.signal});clearTimeout(timer);
+   if(!res.ok)continue;
+   const rows=extract(await res.json());if(rows.length){merge(rows);received+=rows.length;break}
+  }catch(e){console.warn("API unavailable:",e.message)}
+ }
+ $("status").textContent=received?"LIVE DATA":"API OFFLINE";
+ $("apiMessage").textContent=received?received+" records received.":"No API records received. Check endpoint/CORS, or use manual entry/import.";
+ loading=false;
+}
+function saveManual(){
+ const issue=$("manualPeriod").value.trim(),n=Number($("manualNumber").value);
+ if(!issue||!Number.isInteger(n)||n<0||n>9){$("manualMessage").textContent="Enter a period and a whole number from 0 to 9.";return}
+ if(records.some(r=>r.issue===issue)){$("manualMessage").textContent="This period already exists.";return}
+ const f=makePendingPrediction();
+ const r={issue,n,source:"Manual",outcome:"PENDING",predSize:f?.predSize||"",predNums:f?.predNums||[],jackpot:false};
+ records.unshift(r);evaluateNewResults();save();render();
+ $("manualMessage").textContent="Result saved."; $("manualPeriod").value="";$("manualNumber").value="";
+}
+function download(name,content,type){
+ const u=URL.createObjectURL(new Blob([content],{type})),a=document.createElement("a");
+ a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function applyConf(){
+ if(conf.bg){document.documentElement.style.setProperty("--bg",conf.bg);$("bgColour").value=conf.bg}
+ if(conf.accent){document.documentElement.style.setProperty("--gold",conf.accent);$("accentColour").value=conf.accent}
+ if(conf.image){document.body.style.backgroundImage=`url("${conf.image}")`;document.body.style.backgroundSize="cover"}
+ if(conf.light){document.documentElement.style.setProperty("--bg","#eef2f8");document.documentElement.style.setProperty("--panel","#ffffff");document.documentElement.style.setProperty("--panel2","#e3e9f2");document.documentElement.style.setProperty("--txt","#172033");document.documentElement.style.setProperty("--line","#cbd4e3");document.documentElement.style.setProperty("--muted","#65738a")}
+ if(conf.noAnimations)document.body.classList.add("noAnimations");
+}
+function bind(){
+ $("loginForm").addEventListener("submit",e=>{
+  e.preventDefault();const p=$("password").value;
+  if(p==="jesterhx"||p==="malikhamza"){localStorage.setItem(AUTH,"1");$("login").classList.add("hidden");$("app").classList.remove("hidden");start()}
+  else $("loginError").textContent="Incorrect password.";
+ });
+ document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+ $("sync").onclick=sync;$("testApi").onclick=sync;
+ $("pairSearch").oninput=renderPairs;
+ document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{
+  filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));renderAnalysis();
+ });
+ $("addResult").onclick=saveManual;
+ $("saveApi").onclick=()=>{conf.api1=$("api1").value.trim();conf.api2=$("api2").value.trim();saveConf();$("apiMessage").textContent="API settings saved."};
+ $("applyBg").onclick=()=>{conf.bg=$("bgColour").value;document.documentElement.style.setProperty("--bg",conf.bg);saveConf()};
+ $("applyAccent").onclick=()=>{conf.accent=$("accentColour").value;document.documentElement.style.setProperty("--gold",conf.accent);saveConf()};
+ $("theme").onclick=()=>{
+  conf.light=!conf.light;
+  const root=document.documentElement;
+  if(conf.light){root.style.setProperty("--bg","#eef2f8");root.style.setProperty("--panel","#fff");root.style.setProperty("--panel2","#e3e9f2");root.style.setProperty("--txt","#172033");root.style.setProperty("--line","#cbd4e3");root.style.setProperty("--muted","#65738a")}
+  else {root.style.setProperty("--bg",conf.bg||"#090d16");root.style.setProperty("--panel","#111a29");root.style.setProperty("--panel2","#192438");root.style.setProperty("--txt","#f4f7ff");root.style.setProperty("--line","#293851");root.style.setProperty("--muted","#8f9eb8")}
+  saveConf();render();
+ };
+ $("animations").onclick=()=>{
+  conf.noAnimations=!conf.noAnimations;
+  document.body.classList.toggle("noAnimations",conf.noAnimations);
+  let style=$("noAnimStyle");if(conf.noAnimations&&!style){style=document.createElement("style");style.id="noAnimStyle";style.textContent="*,*:before,*:after{animation:none!important;transition:none!important}";document.head.appendChild(style)}else if(!conf.noAnimations&&style)style.remove();saveConf();
+ };
+ $("applyImage").onclick=()=>{
+  const file=$("bgImage").files[0];if(!file)return alert("Choose an image first.");
+  if(file.size>1500000)return alert("Choose an image under 1.5 MB.");
+  const rd=new FileReader();rd.onload=()=>{conf.image=rd.result;document.body.style.backgroundImage=`url("${conf.image}")`;document.body.style.backgroundSize="cover";saveConf()};rd.readAsDataURL(file);
+ };
+ $("removeImage").onclick=()=>{conf.image="";document.body.style.backgroundImage="";saveConf()};
+ $("export").onclick=()=>download("malik-hamza-history.json",JSON.stringify(records,null,2),"application/json");
+ $("importBtn").onclick=()=>$("importFile").click();
+ $("importFile").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{const j=JSON.parse(await f.text());const rows=Array.isArray(j)?j:extract(j);if(!rows.length)throw Error("No records found");merge(rows);$("apiMessage").textContent="Imported "+rows.length+" records."}
+  catch(err){alert("Import failed: "+err.message)}
+  e.target.value="";
+ };
+ $("clear").onclick=()=>{if(confirm("Delete all saved results and analysis?")){records=[];save();render()}};
+}
+function start(){
+ if(started)return;started=true;
+ records=records.map(norm).filter(Boolean);
+ try{localStorage.setItem(HIST,JSON.stringify(records))}catch(e){}
+ window.addEventListener("beforeunload",()=>{try{localStorage.setItem(HIST,JSON.stringify(records));localStorage.setItem(CONF,JSON.stringify(conf))}catch(e){}});
+ document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){try{localStorage.setItem(HIST,JSON.stringify(records))}catch(e){}}});
+ $("api1").value=conf.api1||API1;$("api2").value=conf.api2||API2;
+ if(conf.bg)$("bgColour").value=conf.bg;if(conf.accent)$("accentColour").value=conf.accent;
+ applyConf();render();sync();
+ setInterval(sync,30000);
+}
+bind();
+if(localStorage.getItem(AUTH)==="1"){$("login").classList.add("hidden");$("app").classList.remove("hidden");start()}
+})();
+</script>
+<script>window.__CF$cv$params={r:'a4fadde56b0790ef',t:'MTc5Mjg2NDY3Ng==',u:'01a16f0feeb175eca04b9aa9b0f67448',ut:'37NXMG_QWStxUzhxEbAeJHLBgltrPnlQ6ZS60fLemI8-1792864677-1.2.1.1-jFIee6pva2YTR3OY5h40BacEcUYojbndlgGt8DVxB4FJKHuqBcAKI4w8ZrvQCeq6_ChgYXy.viRP7dzwR8EI_3v_Jr2TeR1CdqLj2JVTg2I',i:60};(function(){if(!document.body)return;var s=document.createElement('script');s.src='/cdn-cgi/challenge-platform/scripts/precursor/main.js';document.head.appendChild(s);})();</script></body>
+</html>
