@@ -1,11 +1,8 @@
 name: collect-history-24h
-# TEST MODE: har 1 min me chalega (sirf test ke liye)
-# Final ke liye neeche wali 2 lines change karna:
-# cron: "*/5 * * * *" aur LOOP_SECONDS: 270
 
 on:
   schedule:
-    - cron: "* * * * *"
+    - cron: "*/5 1-16 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -18,21 +15,18 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: collect data (TEST 1-min)
+      - name: collect data (16h daily)
         run: node collector.mjs
         env:
-          LOOP_SECONDS: 50
-
+          LOOP_SECONDS: 270
       - name: commit and push (safe)
         run: |
           git config user.name "malik-hamza-bot"
@@ -42,7 +36,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "no changes, skip commit"
           else
-            git commit -m "test: update history $(date -u +%F-%T)" || true
+            git commit -m "auto: update history $(date -u +%F-%T)" || true
           fi
           for i in 1 2 3; do
             git push && break
