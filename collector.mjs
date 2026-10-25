@@ -2,27 +2,31 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const API1 = "https://wingoteacher.lovable.app/api/public/wingo?game=30S";
-const API2 = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageNo=1&pageSize=200";
+const API1 =
+  'https://wingoteacher.lovable.app/api/public/wingo?game=30S';
 
-const OUT_FILE = path.join(process.cwd(), "data", "history.json");
+const API2 =
+  'https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageNo=1&pageSize=200';
+
+const OUT_FILE = path.join(process.cwd(), 'data', 'history.json');
 const INTERVAL_MS = 32000;
-const LOOP_SECONDS = Number(process.env.LOOP_SECONDS || "0");
+const LOOP_SECONDS = Number(process.env.LOOP_SECONDS || '0');
+const MAX_RECORDS = 2000;
 
-function extract(j) {
-  if (Array.isArray(j)) return j;
+function extract(json) {
+  if (Array.isArray(json)) return json;
 
   const candidates = [
-    j?.data?.list,
-    j?.data?.records,
-    j?.data?.history,
-    j?.data?.items,
-    j?.data?.result,
-    j?.list,
-    j?.records,
-    j?.history,
-    j?.result,
-    j?.data
+    json?.data?.list,
+    json?.data?.records,
+    json?.data?.history,
+    json?.data?.items,
+    json?.data?.result,
+    json?.list,
+    json?.records,
+    json?.history,
+    json?.result,
+    json?.data
   ];
 
   for (const rows of candidates) {
@@ -32,52 +36,69 @@ function extract(j) {
   return [];
 }
 
-function norm(r, i = 0) {
-  if (typeof r === "number") {
-    r = { number: r, issue: "row-" + i };
+function norm(record, index = 0) {
+  if (typeof record === 'number') {
+    record = { number: record, issue: `row-${index}` };
   }
 
-  if (typeof r === "string" && /^\d$/.test(r)) {
-    r = { number: Number(r), issue: "row-" + i };
+  if (
+    typeof record === 'string' &&
+    /^\d$/.test(record.trim())
+  ) {
+    record = {
+      number: record.trim(),
+      issue: `row-${index}`
+    };
   }
 
-  if (!r || typeof r !== "object") return null;
+  if (!record || typeof record !== 'object') return null;
 
-  let n = null;
+  let number = null;
 
-  for (const v of [
-    r.n,
-    r.number,
-    r.result,
-    r.openCode,
-    r.winNumber,
-    r.winningNumber,
-    r.num,
-    r.value,
-    r.code
-  ]) {
-    if (v === null || v === undefined) continue;
+  const values = [
+    record.n,
+    record.number,
+    record.result,
+    record.openCode,
+    record.winNumber,
+    record.winningNumber,
+    record.num,
+    record.value,
+    record.code,
+    record.premium
+  ];
 
-    const match = String(v).trim().match(/^\d/);
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+
+    const match = String(value).trim().match(/^\d/);
 
     if (match) {
-      n = Number(match[0]);
+      number = Number(match[0]);
       break;
     }
   }
 
-  if (!Number.isInteger(n) || n < 0 || n > 9) return null;
+  if (!Number.isInteger(number) || number < 0 || number > 9) {
+    return null;
+  }
 
-  const issue = String(
-    r.issueNumber ??
-    r.issue ??
-    r.period ??
-    r.periodNumber ??
-    r.drawIssue ??
-    ("row-" + i)
-  );
+  const rawIssue =
+    record.issueNumber ??
+    record.issue ??
+    record.period ??
+    record.periodNumber ??
+    record.drawIssue;
 
-  return { issue, n };
+  // Real issue IDs are required; synthetic IDs could create duplicates.
+  if (rawIssue === null || rawIssue === undefined) {
+    return null;
+  }
+
+  const issue = String(rawIssue).trim();
+  if (!issue) return null;
+
+  return { issue, n: number };
 }
 
 async function fetchRows(url) {
@@ -86,29 +107,30 @@ async function fetchRows(url) {
 
   try {
     const requestUrl = new URL(url);
-    requestUrl.searchParams.set("ts", Date.now().toString());
+    requestUrl.searchParams.set('ts', Date.now().toString());
 
-    const res = await fetch(requestUrl, {
+    const response = await fetch(requestUrl, {
       signal: controller.signal,
-     headers: {
-  "Accept": "application/json, text/plain, */*",
-  "Origin": "https://www.92strike4.com",
-  "Referer": "https://www.92strike4.com/",
-  "User-Agent": "Mozilla/5.0 (Linux; Android 16; Pixel 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36"
-}
+      headers: {
+        Accept: 'application/json, text/plain, */*',
+        Origin: 'https://www.92strike4.com',
+        Referer: 'https://www.92strike4.com/',
+        'User-Agent':
+          'Mozilla/5.0 (Linux; Android 16; Pixel 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36'
+      }
     });
 
-    if (!res.ok) {
-      throw new Error("HTTP " + res.status);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
 
-    const text = await res.text();
-    let json;
+    const text = await response.text();
 
+    let json;
     try {
       json = JSON.parse(text);
     } catch {
-      throw new Error("Response JSON nahi hai");
+      throw new Error('Response valid JSON nahi hai');
     }
 
     return extract(json);
@@ -117,7 +139,36 @@ async function fetchRows(url) {
   }
 }
 
-async function oneRound(mapState) {
+function loadOld() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(OUT_FILE, 'utf8'));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAll(map) {
+  const records = [...map.values()]
+    .sort((a, b) =>
+      String(b.issue).localeCompare(
+        String(a.issue),
+        undefined,
+        { numeric: true }
+      )
+    )
+    .slice(0, MAX_RECORDS);
+
+  fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
+
+  const temporaryFile = `${OUT_FILE}.tmp`;
+  fs.writeFileSync(temporaryFile, JSON.stringify(records, null, 2));
+  fs.renameSync(temporaryFile, OUT_FILE);
+
+  return records.length;
+}
+
+async function oneRound(map) {
   let added = 0;
 
   for (const url of [API1, API2]) {
@@ -126,119 +177,88 @@ async function oneRound(mapState) {
 
       console.log(
         new Date().toISOString(),
+        'API:',
         url,
-        "->",
-        rows.length,
-        "rows"
+        'Rows received:',
+        rows.length
       );
 
-      for (let i = 0; i < rows.length; i++) {
-        const record = norm(rows[i], i);
+      let validRows = 0;
 
+      for (let index = 0; index < rows.length; index++) {
+        const record = norm(rows[index], index);
         if (!record) continue;
 
-        if (!mapState.has(record.issue)) {
-          mapState.set(record.issue, record);
+        validRows++;
+
+        if (!map.has(record.issue)) {
+          map.set(record.issue, record);
           added++;
         }
       }
 
-      if (rows.length > 0) break;
+      console.log('Valid records:', validRows);
+
+      // Try the next API if this one returned no usable records.
+      if (validRows > 0) break;
     } catch (error) {
-      console.log("Fetch failed:", url, error.message);
+      console.error('Fetch failed:', url, error.message);
     }
   }
 
   return added;
 }
 
-function loadOld() {
-  try {
-    const json = JSON.parse(fs.readFileSync(OUT_FILE, "utf8"));
-    return Array.isArray(json) ? json : [];
-  } catch {
-    return [];
+function mergeExisting(map) {
+  for (const record of loadOld()) {
+    const normalized = norm(record);
+
+    if (normalized && !map.has(normalized.issue)) {
+      map.set(normalized.issue, normalized);
+    }
   }
 }
 
-function saveAll(mapState) {
-  const all = [...mapState.values()]
-    .sort((a, b) =>
-      String(b.issue).localeCompare(
-        String(a.issue),
-        undefined,
-        { numeric: true }
-      )
-    )
-    .slice(0, 2000);
-
+async function main() {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
-  fs.writeFileSync(OUT_FILE, JSON.stringify(all, null, 2));
 
-  return all.length;
-}
+  console.log('Output file:', OUT_FILE);
+  console.log('Loop seconds:', LOOP_SECONDS);
 
-try {
-  console.log("Output file:", OUT_FILE);
-  console.log("Loop seconds:", LOOP_SECONDS);
+  const map = new Map();
 
-  const old = loadOld();
-  console.log("Existing records:", old.length);
+  mergeExisting(map);
+  console.log('Existing records:', map.size);
 
-  const map = new Map(
-    old
-      .filter(r => r && r.issue !== undefined && r.n !== undefined)
-      .map(r => [String(r.issue), r])
-  );
-
-  if (!LOOP_SECONDS) {
+  if (LOOP_SECONDS <= 0) {
     const added = await oneRound(map);
     const total = saveAll(map);
 
     console.log(`Saved ${total} records; ${added} new.`);
-  } else {
-    const endTime = Date.now() + LOOP_SECONDS * 1000;
-    let totalNew = 0;
-
-    while (Date.now() < endTime) {
-      const added = await oneRound(map);
-      totalNew += added;
-
-      const total = saveAll(map);
-
-      console.log(`Saved ${total} records; ${added} new.`);
-
-      if (Date.now() + INTERVAL_MS >= endTime) break;
-
-      await new Promise(resolve =>
-        setTimeout(resolve, INTERVAL_MS)
-      );
-
-      for (const record of loadOld()) {
-        if (
-          record &&
-          record.issue !== undefined &&
-          !map.has(String(record.issue))
-        ) {
-          map.set(String(record.issue), record);
-        }
-      }
-    }
-
-    console.log(`Loop finished; ${totalNew} new records.`);
+    return;
   }
-} catch (error) {
-  console.error("Collector error:", error?.message || error);
 
-  try {
-    fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
+  const endTime = Date.now() + LOOP_SECONDS * 1000;
+  let totalNew = 0;
 
-    if (!fs.existsSync(OUT_FILE)) {
-      fs.writeFileSync(OUT_FILE, "[]");
-    }
-  } catch (writeError) {
-    console.error("File error:", writeError.message);
+  while (Date.now() < endTime) {
+    mergeExisting(map);
+
+    const added = await oneRound(map);
+    totalNew += added;
+
+    const total = saveAll(map);
+    console.log(`Saved ${total} records; ${added} new.`);
+
+    if (Date.now() + INTERVAL_MS >= endTime) break;
+
+    await new Promise(resolve => setTimeout(resolve, INTERVAL_MS));
   }
+
+  console.log(`Loop finished; ${totalNew} new records.`);
 }
 
-process.exit(0);
+main().catch(error => {
+  console.error('Collector error:', error?.stack || error);
+  process.exitCode = 1;
+});
