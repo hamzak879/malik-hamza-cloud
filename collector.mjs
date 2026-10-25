@@ -40,11 +40,17 @@ async function fetchRows(url) {
   const t = setTimeout(() => ctrl.abort(), 20000);
 
   try {
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      headers: {
-        "Accept": "application/json, text/plain, */*"
-      }
+const requestUrl = new URL(url);
+requestUrl.searchParams.set("ts", Date.now().toString());
+
+const res = await fetch(requestUrl, {
+  signal: ctrl.signal,
+  headers: {
+    "Accept": "application/json, text/plain, */*",
+    "Origin": "https://www.92strike4.com",
+    "Referer": "https://www.92strike4.com/"
+  }
+});
     });
 
     if (!res.ok) {
