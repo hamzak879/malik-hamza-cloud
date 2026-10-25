@@ -34,27 +34,38 @@ function norm(r, i = 0) {
   return { issue, n };
 }
 
+
 async function fetchRows(url) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 20000);
+
   try {
     const res = await fetch(url, {
       signal: ctrl.signal,
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://www.google.com/",
-        "Origin": "https://www.google.com"
+        "Accept": "application/json, text/plain, */*"
       }
     });
-    if (!res.ok) throw new Error("HTTP " + res.status);
+
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+
     const text = await res.text();
     let j;
-    try { j = JSON.parse(text); } catch { throw new Error("not-json"); }
+
+    try {
+      j = JSON.parse(text);
+    } catch {
+      throw new Error("not-json");
+    }
+
     return extract(j);
-  } finally { clearTimeout(t); }
+  } finally {
+    clearTimeout(t);
+  }
 }
+
 
 async function oneRound(mapState) {
   let got = 0;
