@@ -4,7 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const API1 = "https://wingoteacher.lovable.app/api/public/wingo?game=30S";
-const API2 = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?size=200";
+
+const API2 = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageNo=1&pageSize=200";
+
 
 // FIX: Actions me sahi path ke liye process.cwd() use karo (import.meta wala bug fix)
 const OUT_FILE = path.join(process.cwd(), "data", "history.json");
